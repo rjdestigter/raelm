@@ -1,29 +1,27 @@
 module Raelm.Map.Views exposing (view)
 
+import Html.App
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
-import Html.Events exposing (on)
-import Json.Decode as Json exposing ((:=))
 
 import Raelm.Base.Views exposing (..)
 -- import Raelm.Base.Styles exposing (raelmContainer)
-import Raelm.Map.Messages exposing (MapMessage(Centre))
+import Raelm.Map.Messages exposing (MapMessage(..))
+import Raelm.Base.Messages exposing (Events(..))
 
 import Raelm.Map.Models exposing (MapPositionModel)
 
-type alias Position =
-  (Float, Float)
+mapper : Events -> MapMessage
+mapper event =
+  case event of
+    Click (x, y) ->
+      Centre ( toFloat x, toFloat y)
+    Drag (x, y, k, l) ->
+      Pan ( toFloat x, toFloat y, 0, 0)
+    Scroll z ->
+      Zoom z
 
-decoder : Json.Decoder (Float, Float)
-decoder =
-  Json.object2 (,)
-    ("offsetX" := Json.float)
-    ("offsetY" := Json.float)
-
-onClick =
-  on "click" ( Json.map Centre decoder )
-
---children : MapPositionModel -> Html.Html a
+children : MapPositionModel -> Html Events
 children {centre} =
   let
     (x, y) = centre
@@ -31,7 +29,6 @@ children {centre} =
     div [ style [ ("backgroundColor", "Yellow")
                 , ("height", "80%")
                 ]
-        , onClick
         ]
     [ text (toString x)
     , text ","
@@ -39,4 +36,9 @@ children {centre} =
     ]
 
 view : MapPositionModel -> Html MapMessage
-view mapPositionModel = Raelm.Base.Views.view (children mapPositionModel)
+view mapPositionModel =
+  let
+    render =
+      Raelm.Base.Views.view (children mapPositionModel)
+  in
+    Html.App.map mapper render

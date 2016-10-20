@@ -1,8 +1,8 @@
 module Raelm.Base.Messages exposing (..)
 
-import Raelm.Types.Coordinates exposing (X, Y, Z)
+import Raelm.Base.Types exposing (X, Y, Z)
 
-type Msg
+type Events
   = Click (X, Y)
   | Drag (X, Y, X, Y)
   | Scroll Z
