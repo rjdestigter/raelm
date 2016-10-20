@@ -11,21 +11,23 @@ import Models exposing (AppModel)
 import Messages exposing (Msg(RaelmMsg))
 
 -- Dependency imports
-import Raelm.Map.Views exposing (..)
+-- Use Base for Mouse events
+import Raelm.Base.Messages exposing(EventMsg)
 import Raelm.Base.Views exposing (..)
-import Raelm.Base.Messages exposing(EventMsg(..))
-import Raelm.Map.Messages exposing(MapMessage(..))
--- import Raelm.Base.Types exposing (EventMode(..))
 
--- Maps a local event message into a MapMessage
+-- Use Map for MapMessages
+import Raelm.Map.Views exposing (..)
+import Raelm.Map.Messages exposing(MapEvent, MapMessage(..))
+
+-- Translates between Base and Map
 eventMapper : EventMsg -> MapMessage
 eventMapper event =
   case event of
-    Click (x, y) ->
-      Centre ( toFloat x, toFloat y)
-    Move (x, y) ->
-      Pan ( toFloat x, toFloat y, 0, 0)
-    Scroll z ->
+    Raelm.Base.Messages.Click (x, y) ->
+      Event (Raelm.Map.Messages.Click ( toFloat x, toFloat y))
+    Raelm.Base.Messages.Move (x, y) ->
+      Event (Raelm.Map.Messages.Move ( toFloat x, toFloat y ))
+    Raelm.Base.Messages.Scroll z ->
       Zoom z
 
 -- Exports

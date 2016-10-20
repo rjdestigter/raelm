@@ -1,29 +1,43 @@
 module Raelm.Map.Views exposing (view)
 
 import Html.App
-import Html exposing (Html, div, text)
+import Html exposing (Html, span, div, text)
 import Html.Attributes exposing (style)
 
-import Raelm.Base.Views exposing (..)
--- import Raelm.Base.Styles exposing (raelmContainer)
+-- Local imports
 import Raelm.Map.Messages exposing (MapMessage(..))
--- import Raelm.Base.Messages exposing (MouseEventsMsg(..))
-
 import Raelm.Map.Models exposing (MapPositionModel)
--- import Raelm.Base.MouseEvents exposing(eventMapper)
+
+import Raelm.Layer.Tile exposing (tileLayer)
+import Raelm.Layer.Tile.Types exposing (TileOptionSet(..))
+import Raelm.Types.Options exposing (LayerOptions)
+
+layerOptions = LayerOptions Nothing Nothing Nothing Nothing
+
+-- Exports
+coords label x y =
+  span [ style [ ("padding", "0 15px") ] ]
+    [ text label
+    , text " ("
+    , text (toString x)
+    , text ","
+    , text (toString y)
+    , text ")"
+    ]
 
 -- children : MapPositionModel -> Html MouseEventsMsg
-children {centre} =
+children {events} =
   let
-    (x, y) = centre
+    (x, y) = events.click
+    (mx, my) = events.move
   in
     div [ style [ ("backgroundColor", "Yellow")
                 , ("height", "80%")
                 ]
         ]
-    [ text (toString x)
-    , text ","
-    , text (toString y)
+    [ coords "Click" x y
+    , coords "Move" mx my
+    , tileLayer (Just "http") (LayerOption layerOptions)
     ]
 
 -- view : (a -> b) -> c -> MapPositionModel -> Html MapMessage
