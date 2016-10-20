@@ -6,11 +6,12 @@ import Html.Attributes exposing (style)
 
 -- Local imports
 import Raelm.Base.Types exposing (EventMode(..))
-import Raelm.Base.Messages exposing (MouseEventsMsg(..))
+import Raelm.Base.Messages exposing (EventMsg, MouseEventMsg(..), TouchEventMsg(..))
 import Raelm.Base.MouseEvents exposing (onClick)
 import Raelm.Base.TouchEvents exposing (onTouch)
 import Raelm.Base.Styles exposing (raelmContainer)
 
+-- onEvent : EventMode -> EventMsg
 onEvent eventMode =
   case eventMode of
     Mouse ->
@@ -19,7 +20,7 @@ onEvent eventMode =
       onTouch
 
 -- Exports
-view : EventMode -> Html MouseEventsMsg -> Html MouseEventsMsg
+-- view : EventMode -> Html EventMsg -> Html EventMsg
 view eventMode children =
   div [ style raelmContainer
       , onEvent eventMode

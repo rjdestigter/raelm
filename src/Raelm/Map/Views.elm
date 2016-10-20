@@ -7,12 +7,12 @@ import Html.Attributes exposing (style)
 import Raelm.Base.Views exposing (..)
 -- import Raelm.Base.Styles exposing (raelmContainer)
 import Raelm.Map.Messages exposing (MapMessage(..))
-import Raelm.Base.Messages exposing (MouseEventsMsg(..))
+-- import Raelm.Base.Messages exposing (MouseEventsMsg(..))
 
 import Raelm.Map.Models exposing (MapPositionModel)
 -- import Raelm.Base.MouseEvents exposing(eventMapper)
 
-children : MapPositionModel -> Html MouseEventsMsg
+-- children : MapPositionModel -> Html MouseEventsMsg
 children {centre} =
   let
     (x, y) = centre

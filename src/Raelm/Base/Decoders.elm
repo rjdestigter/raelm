@@ -2,7 +2,8 @@ module Raelm.Base.Decoders exposing (..)
 
 import Json.Decode as Json exposing ((:=))
 
-import Raelm.Base.Messages exposing (MouseEventsMsg(Click))
+import Raelm.Base.Messages exposing (MouseEventMsg(MouseClick))
+import Raelm.Base.Messages exposing (TouchEventMsg(TouchTap))
 
 offsetDecoder : Json.Decoder (Int, Int)
 offsetDecoder =
@@ -10,5 +11,10 @@ offsetDecoder =
     ("offsetX" := Json.int)
     ("offsetY" := Json.int)
 
-clickDecoder =
-  Json.map Click offsetDecoder
+clickDecoder t = Json.map t offsetDecoder
+
+mouseClickDecoder eventMapper =
+  Json.map eventMapper (clickDecoder MouseClick)
+
+touchTapDecoder eventMapper =
+  Json.map eventMapper (clickDecoder TouchTap)

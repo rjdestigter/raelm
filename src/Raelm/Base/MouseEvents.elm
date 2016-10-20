@@ -4,23 +4,23 @@ module Raelm.Base.MouseEvents exposing (..)
 import Html.Events exposing (on)
 
 -- Local Imports
-import Raelm.Base.Messages exposing (MouseEventsMsg(..))
-import Raelm.Base.Decoders exposing (clickDecoder)
+import Raelm.Base.Messages exposing (EventMsg(..), MouseEventMsg(..))
+import Raelm.Base.Decoders exposing (mouseClickDecoder)
 
 -- Dependency Imports
 import Raelm.Map.Messages exposing (MapMessage(..))
 
 -- Exports
 onClick =
-  on "click" clickDecoder
+  on "click" (mouseClickDecoder eventMapper)
 
 -- Maps a local event message into a MapMessage
-eventMapper : MouseEventsMsg -> MapMessage
+eventMapper : MouseEventMsg -> EventMsg
 eventMapper event =
   case event of
-    Click (x, y) ->
-      Centre ( toFloat x, toFloat y)
-    Drag (x, y, k, l) ->
-      Pan ( toFloat x, toFloat y, 0, 0)
-    Scroll z ->
-      Zoom z
+    MouseClick (x, y) ->
+      Click ( x, y )
+    MouseMove (x, y) ->
+      Move ( x, y )
+    MouseWheel z ->
+      Scroll z
