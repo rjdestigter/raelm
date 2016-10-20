@@ -2,7 +2,7 @@ module Raelm.Base.Decoders exposing (..)
 
 import Json.Decode as Json exposing ((:=))
 
-import Raelm.Base.Messages exposing (Events(Click))
+import Raelm.Base.Messages exposing (MouseEventsMsg(Click))
 
 offsetDecoder : Json.Decoder (Int, Int)
 offsetDecoder =

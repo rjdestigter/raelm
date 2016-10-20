@@ -1,26 +1,26 @@
-module Raelm.Base.MouseEvents exposing (..)
+module Raelm.Base.TouchEvents exposing (..)
 
 -- Elm Imports
 import Html.Events exposing (on)
 
 -- Local Imports
-import Raelm.Base.Messages exposing (MouseEventsMsg(..))
+import Raelm.Base.Messages exposing (TouchEventsMsg(..))
 import Raelm.Base.Decoders exposing (clickDecoder)
 
 -- Dependency Imports
 import Raelm.Map.Messages exposing (MapMessage(..))
 
 -- Exports
-onClick =
+onTouch =
   on "click" clickDecoder
 
 -- Maps a local event message into a MapMessage
-eventMapper : MouseEventsMsg -> MapMessage
+eventMapper : TouchEventsMsg -> MapMessage
 eventMapper event =
   case event of
-    Click (x, y) ->
+    Tap (x, y) ->
       Centre ( toFloat x, toFloat y)
-    Drag (x, y, k, l) ->
+    Swipe (x, y, k, l) ->
       Pan ( toFloat x, toFloat y, 0, 0)
-    Scroll z ->
+    Pinch z ->
       Zoom z
