@@ -11,6 +11,7 @@ import Raelm.Map.Models exposing (MapPositionModel)
 import Raelm.Layer.Tile exposing (tileLayer)
 import Raelm.Layer.Tile.Types exposing (TileOptionSet(..))
 import Raelm.Types.Options exposing (LayerOptions)
+import String exposing (concat, join)
 
 layerOptions = LayerOptions Nothing Nothing Nothing Nothing
 
@@ -26,10 +27,16 @@ coords label x y =
     ]
 
 -- children : MapPositionModel -> Html MouseEventsMsg
-children {events} =
+children {dom, events} =
   let
     (x, y) = events.click
     (mx, my) = events.move
+    (top, left, width, height) =
+      case dom.rect of
+        Nothing ->
+          ("0", "0", "0", "0")
+        Just {top, left, width, height} ->
+          (toString top, toString left, toString width, toString height)
   in
     div [ style [ ("backgroundColor", "Yellow")
                 , ("height", "80%")
@@ -37,13 +44,14 @@ children {events} =
         ]
     [ coords "Click" x y
     , coords "Move" mx my
+    , text (concat ["(", (join "," [top, left, width, height]), ")"])
     , tileLayer (Just "http") (LayerOption layerOptions)
     ]
 
 -- view : (a -> b) -> c -> MapPositionModel -> Html MapMessage
-view eventMapper baseView mapPositionModel =
+view eventMapper baseView raelmModel =
   let
     renderedView =
-      baseView (children mapPositionModel)
+      baseView raelmModel.dom.intialized (children raelmModel)
   in
     Html.App.map eventMapper renderedView

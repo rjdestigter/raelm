@@ -2,7 +2,7 @@ module Raelm.Base.Views exposing (view, mouseView, touchView)
 
 -- Lang imports
 import Html exposing (Html, div, button, text)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (id, style)
 
 -- Local imports
 import Raelm.Base.Types exposing (EventMode(..))
@@ -20,16 +20,21 @@ onClick eventMode =
       Raelm.Base.TouchEvents.onTouch
 
 onMove = Raelm.Base.MouseEvents.onMove
+onInitialize = Raelm.Base.MouseEvents.onInitialize
 
 -- Exports
 -- view : EventMode -> Html EventMsg -> Html EventMsg
-view eventMode children =
+view mapId eventMode initialized children =
   div [ style raelmContainer
+      , id mapId
       , onClick eventMode
-      , onMove
+      , if initialized then onMove else onInitialize mapId
       ]
-    [ children ]
+    -- [ if initialized then children else (text "")
+    [ children
+    -- , if initialized then (text "Initialized") else (text "Black Hole")
+    ]
 
-mouseView = view Mouse
+mouseView mapId = view mapId Mouse
 
-touchView = view Touch
+touchView mapId = view mapId Touch

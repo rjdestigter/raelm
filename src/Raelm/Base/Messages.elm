@@ -1,6 +1,6 @@
 module Raelm.Base.Messages exposing (..)
 
-import Raelm.Base.Types exposing (X, Y, Z)
+import Raelm.Base.Types exposing (X, Y, Z, Initialize)
 
 type MouseEventMsg
   = MouseClick (X, Y)
@@ -16,3 +16,4 @@ type EventMsg
   = Click (X, Y)
   | Move (X, Y)
   | Scroll Z
+  | Init Initialize

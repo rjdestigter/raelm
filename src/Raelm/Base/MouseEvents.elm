@@ -5,12 +5,15 @@ import Html.Events exposing (on)
 
 -- Local Imports
 import Raelm.Base.Messages exposing (EventMsg(..), MouseEventMsg(..))
-import Raelm.Base.Decoders exposing (mouseClickDecoder, mouseMoveDecoder)
+import Raelm.Base.Decoders exposing (initializeDecoder, mouseClickDecoder, mouseMoveDecoder)
 
 -- Dependency Imports
 import Raelm.Map.Messages exposing (MapMessage(..))
 
 -- Exports
+onInitialize mapId =
+  on "mousemove" (initializeDecoder mapId)
+
 onClick =
   on "click" (mouseClickDecoder eventMapper)
 

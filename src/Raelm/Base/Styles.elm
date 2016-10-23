@@ -4,7 +4,8 @@ import Style exposing (..)
 
 raelmContainer : List Style
 raelmContainer =
-  [ width (pc 100)
+  [ position "absolute"
+  , width (pc 100)
   , height (pc 100)
   , backgroundColor "Cyan"
   ]

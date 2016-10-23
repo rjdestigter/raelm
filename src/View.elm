@@ -23,6 +23,8 @@ import Raelm.Map.Messages exposing(MapEvent, MapMessage(..))
 eventMapper : EventMsg -> MapMessage
 eventMapper event =
   case event of
+    Raelm.Base.Messages.Init i ->
+      Event (Raelm.Map.Messages.Init i)
     Raelm.Base.Messages.Click (x, y) ->
       Event (Raelm.Map.Messages.Click ( toFloat x, toFloat y))
     Raelm.Base.Messages.Move (x, y) ->
@@ -34,7 +36,7 @@ eventMapper event =
 -- view : AppModel -> Html a
 view model =
     let
-      baseView = Raelm.Base.Views.mouseView
+      baseView = Raelm.Base.Views.mouseView "myMap"
     in
       div [ style [ ("height", "100%"), ("backgroundColor", "Cyan") ] ]
         [ Html.App.map RaelmMsg (Raelm.Map.Views.view (eventMapper) (baseView) model.mapModel) ]
