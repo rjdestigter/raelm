@@ -2,10 +2,10 @@ module Raelm.Geometry.Transformation exposing (..)
 
 import Raelm.Types.Coordinates exposing (Point, LngLat)
 
-transform : Float -> Float -> Float -> Float -> Point -> Int -> LngLat
+transform : Float -> Float -> Float -> Float -> Point -> Float -> LngLat
 transform a b c d (x, y) scale =
-  ((toFloat scale) * (a * (toFloat x) + b), (toFloat scale) * (c * (toFloat y) + d))
+  (scale * (a * x + b), scale * (c * y + d))
 
-untransform : Float -> Float -> Float -> Float -> Point -> Int -> LngLat
+untransform : Float -> Float -> Float -> Float -> Point -> Float -> LngLat
 untransform a b c d (x, y) scale =
-  (((toFloat x) / (toFloat scale) - b) / a, ((toFloat y) / (toFloat scale) - d) / c)
+  ((x / scale - b) / a, (y / scale - d) / c)

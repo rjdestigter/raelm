@@ -7,7 +7,15 @@ type alias XY = (X, Y)
 
 type alias Lat = Float
 type alias Lng = Float
-type alias Point = (Int, Int)
+type alias Point = (X, Y)
 type alias LngLat = (Lng, Lat)
 type alias LatLng = (Lat, Lng)
-type alias Bounds = (LngLat, LngLat)
+type alias Bounds = (Point, Point)
+type alias LngLatBounds = (LngLat, LngLat)
+
+type alias BoundsMinMax = {
+  minX : Point,
+  minY : Point,
+  maxX: Point,
+  maxY: Point
+}
