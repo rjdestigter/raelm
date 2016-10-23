@@ -6,6 +6,8 @@ import Raelm.Base.Types exposing (Initialize)
 type MapEvent
   = Click (X, Y)
   | Move (X, Y)
+  | Down
+  | Up
   | Init Initialize
 
 type MapMessage

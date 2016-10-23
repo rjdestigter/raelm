@@ -6,6 +6,8 @@ type MouseEventMsg
   = MouseClick (X, Y)
   | MouseMove (X, Y)
   | MouseWheel Z
+  | MouseDown
+  | MouseUp
 
 type TouchEventMsg
   = TouchTap (X, Y)
@@ -16,4 +18,6 @@ type EventMsg
   = Click (X, Y)
   | Move (X, Y)
   | Scroll Z
+  | Down
+  | Up
   | Init Initialize

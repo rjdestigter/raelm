@@ -8,8 +8,6 @@ import Raelm.Base.Messages exposing (MouseEventMsg(MouseClick, MouseMove), Event
 import Raelm.Base.Messages exposing (TouchEventMsg(TouchTap))
 import Raelm.Base.Types exposing (Initialize)
 
-import Debug exposing (..)
-
 type Node = Node
   { id : String
   , rectangle: Maybe Rectangle
@@ -19,8 +17,8 @@ type Node = Node
 offsetDecoder : Json.Decoder (Int, Int)
 offsetDecoder =
   Json.object2 (,)
-    ("offsetX" := Json.int)
-    ("offsetY" := Json.int)
+    ("pageX" := Json.int)
+    ("pageY" := Json.int)
 
 lazy : (() -> Decoder a) -> Decoder a
 lazy getDecoder =

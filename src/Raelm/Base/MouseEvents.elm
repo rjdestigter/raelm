@@ -20,6 +20,9 @@ onClick =
 onMove =
   on "mousemove" (mouseMoveDecoder eventMapper)
 
+onMouseDown = Html.Events.onMouseDown Down
+onMouseUp = Html.Events.onMouseUp Up
+
 -- Maps a local event message into a MapMessage
 eventMapper : MouseEventMsg -> EventMsg
 eventMapper event =
@@ -30,3 +33,7 @@ eventMapper event =
       Move ( x, y )
     MouseWheel z ->
       Scroll z
+    MouseDown ->
+      Down
+    MouseUp ->
+      Up

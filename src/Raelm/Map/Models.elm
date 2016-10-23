@@ -5,10 +5,12 @@ import DOM exposing (Rectangle)
 type alias MapEventsModel =
   { click : (Float, Float)
   , move : (Float, Float)
+  , down : Bool
+  , downPosition : Maybe (Float, Float)
   }
 
 type alias DomModel =
-  { intialized : Bool
+  { initialized : Bool
   , rect: Maybe Rectangle
   }
 
@@ -23,6 +25,6 @@ initialModel : MapPositionModel
 initialModel =
   { centre = (0, 0)
   , zoom = 5
-  , events = MapEventsModel (0, 0) (0, 0)
+  , events = MapEventsModel (0, 0) (0, 0) False Nothing
   , dom = DomModel False Nothing
   }

@@ -20,7 +20,10 @@ onClick eventMode =
       Raelm.Base.TouchEvents.onTouch
 
 onMove = Raelm.Base.MouseEvents.onMove
+onMouseDown = Raelm.Base.MouseEvents.onMouseDown
+onMouseUp = Raelm.Base.MouseEvents.onMouseUp
 onInitialize = Raelm.Base.MouseEvents.onInitialize
+
 
 -- Exports
 -- view : EventMode -> Html EventMsg -> Html EventMsg
@@ -28,6 +31,8 @@ view mapId eventMode initialized children =
   div [ style raelmContainer
       , id mapId
       , onClick eventMode
+      , onMouseDown
+      , onMouseUp
       , if initialized then onMove else onInitialize mapId
       ]
     -- [ if initialized then children else (text "")

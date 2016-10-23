@@ -29,6 +29,10 @@ eventMapper event =
       Event (Raelm.Map.Messages.Click ( toFloat x, toFloat y))
     Raelm.Base.Messages.Move (x, y) ->
       Event (Raelm.Map.Messages.Move ( toFloat x, toFloat y ))
+    Raelm.Base.Messages.Down ->
+      Event Raelm.Map.Messages.Down
+    Raelm.Base.Messages.Up ->
+      Event Raelm.Map.Messages.Up
     Raelm.Base.Messages.Scroll z ->
       Zoom z
 
