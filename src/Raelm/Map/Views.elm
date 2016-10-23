@@ -45,7 +45,9 @@ children {dom, events} =
           (toString top, toString left, toString width, toString height)
   in
     div [ style [ ("backgroundColor", "Yellow")
-                , ("height", "80%")
+                , ("position", "absolute")
+                , ("top", "0px")
+                , ("left", "0px")
                 ]
         ]
     [ coords "Click" x y

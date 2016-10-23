@@ -13,6 +13,9 @@ view url options =
   in
     div [ class "raelm-layer"
         , style [ ("opacity", toString tileOptions.opacity)
+                , ("position", "absolute")
+                , ("top", "0px")
+                , ("left", "0px")
                 , ("backgroundColor", "Lime")
                 , ("height", "100%")
                 ]

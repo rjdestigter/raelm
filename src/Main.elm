@@ -6,6 +6,8 @@ import View exposing (view)
 import Models exposing (AppModel, initialModel)
 import Messages exposing (Msg)
 
+import Raelm.Geo.CRS.EPSG3857
+
 init : ( AppModel, Cmd Msg )
 init =
     ( initialModel, Cmd.none )
