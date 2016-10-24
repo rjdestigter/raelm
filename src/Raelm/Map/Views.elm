@@ -70,6 +70,7 @@ children {centre, zoom, dom, events} =
     , tileLayer (Just "http") (LayerOption layerOptions) { centre = centre
                                                           , zoom = zoom
                                                           , size = (width, height)
+                                                          , origin = (originX, originY)
                                                           }
     ]
 

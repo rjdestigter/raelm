@@ -12,6 +12,10 @@ getMinMaxBounds ((x1, y1), (x2, y2)) =
   in
     (minPoint, maxPoint)
 
+scaleBy : (Float, Float) -> (Float, Float) -> Point
+scaleBy (x, y) (scaleX, scaleY) =
+  (x * scaleX, y * scaleY)
+
 unscaleBy : (Float, Float) -> (Float, Float) -> Point
 unscaleBy (x, y) (unscaleX, unscaleY) =
   (x / unscaleX, y / unscaleY)
@@ -28,12 +32,20 @@ subtractPoint : Point -> (Float, Float) -> Point
 subtractPoint (x, y) (subtractX, subtractY) =
   (x - subtractX, y - subtractY)
 
+divideBy : Point -> Float -> Point
+divideBy (x, y) f =
+  (x / f, y / f)
+
+roundPoint : Point -> Point
+roundPoint (x, y) =
+  (toFloat (round x), toFloat (round y))
+
 getBoundsCentre ((x1, y1), (x2, y2)) roundIt =
   let
     ((minX, minY), (maxX, maxY)) = getMinMaxBounds ((x1, y1), (x2, y2))
     (avgX, avgY) = ( (minX + maxX) / 2, (minY + maxY) / 2)
   in
     if roundIt == True then
-      (toFloat (round avgX), toFloat (round avgY))
+      roundPoint (avgX, avgY)
     else
       (avgX, avgY)
