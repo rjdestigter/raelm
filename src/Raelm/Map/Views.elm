@@ -15,6 +15,10 @@ import Raelm.Map.Panes.Map exposing (mapPane)
 import Raelm.Layer.Tile exposing (tileLayer)
 import Raelm.Layer.Tile.Types exposing (TileOptionSet(..))
 
+import Raelm.Geo.CRS.EPSG3857 exposing (latLngToPoint, pointToLatLng)
+
+import Raelm.Utils.Coordinates exposing (unscaleBy, ceilPoint, floorPoint)
+
 layerOptions = LayerOptions Nothing Nothing Nothing Nothing
 
 -- Exports
@@ -28,8 +32,8 @@ coords label x y =
     , text ")"
     ]
 
--- children : MapPositionModel -> Html MouseEventsMsg
-children {dom, events} =
+hun n = toFloat ( round ( n ) )
+children {centre, zoom, dom, events} =
   let
     (x, y) = events.click
     (mx, my) = events.move
@@ -37,25 +41,36 @@ children {dom, events} =
       case events.downPosition of
         Just dp -> dp
         Nothing -> (-1, -1)
+
     (top, left, width, height) =
       case dom.rect of
         Nothing ->
-          ("0", "0", "0", "0")
+          (0, 0, 0, 0)
         Just {top, left, width, height} ->
-          (toString top, toString left, toString width, toString height)
+          (top, left, width, height)
+
+    (halfWidth, halfHeight) = (width / 2, height / 2)
+    (centreX, centreY) = latLngToPoint centre zoom
+    (originX, originY) = (centreX - halfWidth, centreY - halfHeight)
+    (projectedX, projectedY) = (mx - left + originX, my - top + originY)
+    (lng, lat) = pointToLatLng (projectedX, projectedY) zoom
   in
     div [ style [ ("backgroundColor", "Yellow")
-                , ("position", "absolute")
-                , ("top", "0px")
-                , ("left", "0px")
+                , ("position", "fixed")
+                , ("width", "100vw")
+                , ("height", "50px")
                 ]
         ]
-    [ coords "Click" x y
+    [ coords "LngLat" (hun lng) (hun lat)
+    , coords "origin" originX originY
     , coords "Move" mx my
     , coords "Down position" downX downY
-    , text (concat ["(", (join "," [top, left, width, height]), ")"])
+    , text (concat ["(", (join "," (List.map toString [top, left, width, height])), ")"])
     , text (if events.down then " isDown " else " isUp ")
-    , tileLayer (Just "http") (LayerOption layerOptions)
+    , tileLayer (Just "http") (LayerOption layerOptions) { centre = centre
+                                                          , zoom = zoom
+                                                          , size = (width, height)
+                                                          }
     ]
 
 -- view : (a -> b) -> c -> MapPositionModel -> Html MapMessage

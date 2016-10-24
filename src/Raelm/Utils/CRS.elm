@@ -1,8 +1,6 @@
 module Raelm.Geo.CRS exposing (..)
 
 import Raelm.Types.Coordinates exposing (Point, LngLat, Bounds)
-import Raelm.Utils.Coordinates exposing (getMinMaxBounds)
-
 ln2 = 0.6931471805599453
 
 -- Projects geographical coordinates into pixel coordinates for a given zoom.
@@ -57,9 +55,21 @@ zoom scale =
 
 -- Returns the projection's bounds scaled and transformed for the provided `zoom`.
 -- getProjectedBounds : Bounds -> (Point -> Float -> LngLat) -> Int -> Bounds
-getProjectedBounds bounds transformFn zoom =
-  getMinMaxBounds bounds
+getProjectedBounds ((x1, y1), (x2, y2)) transformFn zoom =
+  let
+    s : Float
+    s = scale zoom
 
+    minPoint : Point
+    minPoint = (min x1 x2, min y1 y2)
+
+    maxPoint : Point
+    maxPoint = (max x1 x2, max y1 y2)
+
+    (a1, a2) = transformFn minPoint s
+    (b1, b2) = transformFn maxPoint s
+  in
+    ((a1, a2), (b1, b2))
 
 -- wrapLatLng latlngFn wrapLng wrapLat wrapNumFn latlng =
 --   let

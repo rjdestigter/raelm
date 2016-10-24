@@ -31,7 +31,7 @@ project (x, y) =
 unproject : Point -> LngLat
 unproject (x, y) =
   let
-    d = pi / 180
+    d = 180 / pi  
     lng = x * d / (toFloat r)
     lat = (2 * atan(e ^ (y / (toFloat r))) - (pi / 2)) * d
   in
