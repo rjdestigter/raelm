@@ -28,9 +28,13 @@ ceilPoint : (Float, Float) -> (Float, Float)
 ceilPoint (x, y) =
   (toFloat (ceiling x), toFloat (ceiling y))
 
-subtractPoint : Point -> (Float, Float) -> Point
+subtractPoint : Point -> Point -> Point
 subtractPoint (x, y) (subtractX, subtractY) =
   (x - subtractX, y - subtractY)
+
+addPoint : Point -> Point -> Point
+addPoint (x, y) (addX, addY) =
+  (x - addX, y - addY)
 
 mapPoint : (Float -> Float -> Float) -> Point -> Point -> Point
 mapPoint mapper (x, y) (k, l) =

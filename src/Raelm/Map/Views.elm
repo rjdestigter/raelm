@@ -17,12 +17,13 @@ import Raelm.Layer.Tile.Types exposing (TileOptionSet(..))
 
 import Raelm.Geo.CRS.EPSG3857 exposing (latLngToPoint, pointToLatLng)
 
-import Raelm.Utils.Coordinates exposing (unscaleBy, ceilPoint, floorPoint)
+import Raelm.Utils.Coordinates exposing (..)
+import Raelm.Utils.Style exposing (toPixel)
 
 layerOptions = LayerOptions Nothing Nothing Nothing Nothing
 
 -- Exports
-coords label x y =
+coords label (x, y) =
   span [ style [ ("padding", "0 15px") ] ]
     [ text label
     , text " ("
@@ -32,11 +33,19 @@ coords label x y =
     , text ")"
     ]
 
-hun n = toFloat ( round ( n ) )
+hun (x, y) = (toFloat (round x), toFloat (round y))
+
+t : List (String, String) -> Float -> Float -> List (String, String)
+t s x y =
+  List.concat [s, [ ("position", "absolute")
+  , ("transform", "translateX(" ++ (toPixel x) ++ ") translateY(" ++ (toPixel y) ++ ")")
+  , ("top", "0px")
+  , ("left", "0px")
+  ]]
+
 children {centre, zoom, dom, events} =
   let
     (x, y) = events.click
-    (mx, my) = events.move
     (downX, downY) =
       case events.downPosition of
         Just dp -> dp
@@ -49,30 +58,38 @@ children {centre, zoom, dom, events} =
         Just {top, left, width, height} ->
           (top, left, width, height)
 
-    (halfWidth, halfHeight) = (width / 2, height / 2)
-    (centreX, centreY) = latLngToPoint centre zoom
-    (originX, originY) = (centreX - halfWidth, centreY - halfHeight)
-    (projectedX, projectedY) = (mx - left + originX, my - top + originY)
-    (lng, lat) = pointToLatLng (projectedX, projectedY) zoom
+    halfSize = divideBy (width, height) 2
+    pixelCentre = latLngToPoint centre zoom
+    pixelOrigin = addPoint (subtractPoint pixelCentre halfSize) (left, top)
+    projectedPoint = mapPoint (+) (mapPoint (-) events.move (left, top)) pixelOrigin
+    lngLat = pointToLatLng projectedPoint zoom
   in
-    div [ style [ ("backgroundColor", "Yellow")
-                , ("position", "fixed")
-                , ("width", "100vw")
-                , ("height", "50px")
+    div [ style [ ("position", "absolute")
+                , ("top", "0px")
+                , ("left", "0px")
                 ]
         ]
-    [ coords "LngLat" (hun lng) (hun lat)
-    , coords "origin" originX originY
-    , coords "Move" mx my
-    , coords "Down position" downX downY
-    , text (concat ["(", (join "," (List.map toString [top, left, width, height])), ")"])
-    , text (if events.down then " isDown " else " isUp ")
-    , tileLayer (Just "http") (LayerOption layerOptions) { centre = centre
-                                                          , zoom = zoom
-                                                          , size = (width, height)
-                                                          , origin = (originX, originY)
-                                                          }
-    ]
+        [
+          div [ style (t [ ("backgroundColor", "Yellow")
+                      , ("position", "absolute")
+                      , ("width", "100vw")
+                      , ("height", "50px")
+                      , ("zIndex", "10")
+                      ] -left -top)
+              ]
+          [ coords "LngLat" centre
+          , coords "origin" pixelOrigin
+          , coords "Move" projectedPoint
+          , coords "Down position" (downX, downY)
+          , text (concat ["(", (join "," (List.map toString [top, left, width, height])), ")"])
+          , text (if events.down then " isDown " else " isUp ")
+          ]
+          , tileLayer (Just "http") (LayerOption layerOptions) { centre = centre
+                                                                , zoom = zoom
+                                                                , size = (width, height)
+                                                                , origin = pixelOrigin
+                                                                }
+        ]
 
 -- view : (a -> b) -> c -> MapPositionModel -> Html MapMessage
 view eventMapper baseView raelmModel =

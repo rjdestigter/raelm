@@ -3,6 +3,8 @@ module Raelm.Map.Update exposing (..)
 import Raelm.Map.Messages exposing (MapEvent(..), MapMessage(..))
 import Raelm.Map.Models exposing (MapPositionModel, MapEventsModel, DomModel)
 import Raelm.Types.Coordinates exposing (X, Y, Z, XY)
+import Raelm.Utils.Coordinates exposing (..)
+import Raelm.Geo.CRS.EPSG3857 exposing (latLngToPoint, pointToLatLng)
 import DOM exposing (Rectangle)
 import Debug exposing (..)
 
@@ -19,17 +21,42 @@ init : MapPositionModel -> Maybe Rectangle -> MapPositionModel
 init model rect = ({ model | dom = (initialized rect) })
 
 click : MapPositionModel -> (Float, Float) -> MapPositionModel
-click model (x, y) = ({
-  model
-    | events = (clickEvent x y model.events)
-  })
+click model (x, y) =
+  let
+   events = (moveEvent x y model.events)
+   centre = model.centre
+  --  centre =
+  --    case model.dom.rect of
+  --      Nothing -> model.centre
+  --      Just {top, left, width, height} ->
+  --        let
+  --          halfSize = divideBy (width, height) 2
+  --          pixelCentre = latLngToPoint model.centre model.zoom
+  --          pixelOrigin = addPoint (subtractPoint pixelCentre halfSize) (left, top)
+  --          projectedPoint = mapPoint (+) (mapPoint (-) events.move (left, top)) pixelOrigin
+  --          lngLat = pointToLatLng projectedPoint model.zoom
+  --        in
+  --          lngLat
+  in
+    ({
+      model
+        | centre = centre
+        , events = (clickEvent x y model.events)
+    })
 
 move : MapPositionModel -> (Float, Float) -> MapPositionModel
-move model (x, y) = ({
-  model
-    | events = (moveEvent x y model.events)
-    , dom = if model.events.down then updateRect x y model.events.downPosition model.dom else model.dom
-  })
+move model (x, y) =
+  let
+    dom = if model.events.down then updateRect x y model.events.downPosition model.dom else model.dom
+    events = (moveEvent x y model.events)
+    centre = model.centre
+  in
+   ({
+    model
+      | events = events
+      , dom = dom
+      , centre = centre
+    })
 
 updateRect : Float -> Float -> Maybe (Float, Float) -> {initialized: Bool, rect: Maybe Rectangle} -> DomModel
 updateRect x y downPosition {initialized, rect} =

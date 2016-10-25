@@ -37,6 +37,10 @@ mapXRange : Zoom -> List Float -> Float -> Coords
 mapXRange z xRange y =
   List.map (\x -> (x, y, z)) xRange
 
+getTilePos : Coord -> Point -> Point
+getTilePos (x, y, z) pixelOrigin =
+  subtractPoint (scaleBy (x, y) getTileSize) pixelOrigin
+
 getCoords : Bounds -> Zoom -> Coords
 getCoords ((tileRangeMinX, tileRangeMinY), (tileRangeMaxX, tileRangeMaxY)) zoom =
   List.concatMap (mapXRange zoom [tileRangeMinX..tileRangeMaxX]) [tileRangeMinY..tileRangeMaxY]
@@ -51,14 +55,17 @@ createTiles wrapX coords =
     Just wrapLng ->
       List.map (createTile (wrapLng)) coords
 
-update centre zoom (width, height) wrapX =
+getTileUrl (x, y, zoom) =
+  "https://a.tile.openstreetmap.org/" ++ (toString zoom) ++ "/" ++ (toString x) ++ "/" ++ (toString y) ++ ".png"
+
+update centre zoom (width, height) wrapX origin =
   let
     pixelBounds = getTiledPixelBounds centre zoom (width, height)
     tileRange = pxBoundsToTileRange pixelBounds
     tileCenter = getBoundsCentre tileRange False
     coords = getCoords tileRange zoom
     tiles = createTiles wrapX coords
-    urls = List.map (\(x,y,z) -> "https://a.tile.openstreetmap.org/2/" ++ (toString x) ++ "/" ++ (toString y) ++ ".png") tiles
+    urls = List.map (\c -> (getTileUrl c, getTilePos c origin)) tiles
     -- images = List.map (\u -> (img [src u])) urls
   in
     urls
@@ -90,16 +97,15 @@ view url options {centre, zoom, size, origin} =
     tileOptions = getTileOptions url options
     (width, height) = size
     wrapX = getWrapX zoom
-    s = update centre zoom size wrapX
-    children = List.map (\u -> (img [ src u ] [])) s
+    s = update centre zoom size wrapX origin
+    children = List.map (\(u, (x, y)) -> (img [ src u, style [ ("position", "absolute"), ("transform", "translate3d(" ++ (toString x) ++ "px," ++ (toString y) ++ "px,0)") ] ] [])) s
   in
     div [ class "raelm-layer"
         , style [ ("opacity", toString tileOptions.opacity)
                 , ("position", "absolute")
                 , ("top", "0px")
                 , ("left", "0px")
-                , ("backgroundColor", "Lime")
-                , ("height", "100%")
+                , ("pointerEvents", "none")
                 ]
         ]
         children
