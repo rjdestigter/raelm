@@ -36,9 +36,7 @@ view mapId eventMode initialized children =
       , if initialized then onMove else onInitialize mapId
       ]
     -- [ if initialized then children else (text "")
-    [ children
-    -- , if initialized then (text "Initialized") else (text "Black Hole")
-    ]
+    (if initialized then [children] else [])
 
 mouseView mapId = view mapId Mouse
 

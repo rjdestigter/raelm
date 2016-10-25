@@ -17,6 +17,7 @@ bounds = SphericalMercator.bounds
 
 distance = Earth.distance
 wrapLng = Earth.wrapLng
+wrapLat = Earth.wrapLat
 
 r = Earth.r
 

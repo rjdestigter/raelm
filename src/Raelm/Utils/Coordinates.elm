@@ -32,6 +32,10 @@ subtractPoint : Point -> (Float, Float) -> Point
 subtractPoint (x, y) (subtractX, subtractY) =
   (x - subtractX, y - subtractY)
 
+mapPoint : (Float -> Float -> Float) -> Point -> Point -> Point
+mapPoint mapper (x, y) (k, l) =
+  (mapper x k, mapper y l)
+
 divideBy : Point -> Float -> Point
 divideBy (x, y) f =
   (x / f, y / f)
@@ -49,3 +53,16 @@ getBoundsCentre ((x1, y1), (x2, y2)) roundIt =
       roundPoint (avgX, avgY)
     else
       (avgX, avgY)
+
+wrapNum : Float -> Point -> Float
+wrapNum x (minX, maxX) =
+  -- if x == maxX then
+  --   x
+  -- else
+  let
+    d = round (maxX - minX)
+    a = round (x - minX)
+    b = a % d + d
+    c = b % d
+  in
+    (toFloat c) + minX

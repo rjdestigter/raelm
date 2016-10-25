@@ -15,7 +15,8 @@ project (x, y) =
     d = pi / 180
 
     lat : Float
-    lat = max (min maxLatitude y) (-maxLatitude)
+    lat = max (min maxLatitude y) (0 - maxLatitude)
+    -- lat = Math.max(Math.min(max, latlng.lat), -max)
 
     sinVal: Float
     sinVal = sin (y * d)
@@ -31,7 +32,7 @@ project (x, y) =
 unproject : Point -> LngLat
 unproject (x, y) =
   let
-    d = 180 / pi  
+    d = 180 / pi
     lng = x * d / (toFloat r)
     lat = (2 * atan(e ^ (y / (toFloat r))) - (pi / 2)) * d
   in

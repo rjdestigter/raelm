@@ -2,25 +2,23 @@ module Raelm.Layer.Tile.TileLayer exposing (..)
 import Debug exposing (..)
 
 -- Html imports
-import Html exposing (Html, div, text)
-import Html.Attributes exposing (class, style)
-import String exposing (join)
+import Html exposing (Html, div, text, img)
+import Html.Attributes exposing (class, style, src)
+
 import Raelm.Layer.Tile.Types exposing (..)
 import Raelm.Geo.CRS exposing (scale)
-import Raelm.Geo.CRS.EPSG3857 exposing (latLngToPoint, pointToLatLng, getProjectedBounds)
-import Raelm.Types.Coordinates exposing (Point, LngLat, Bounds, Coord, Coords, Zoom)
+import Raelm.Geo.CRS.EPSG3857 as EPSG3857 exposing (latLngToPoint, pointToLatLng)
+import Raelm.Types.Coordinates exposing (Point, LngLat, Bounds, Zoom, Coord, Coords)
 import Raelm.Utils.Coordinates exposing (..)
 
 getTiledPixelBounds : LngLat -> Int -> (Float, Float) -> Bounds
-getTiledPixelBounds center zoom (width, height) =
+getTiledPixelBounds center zoom size =
   let
-    s = scale zoom
-    (centreX, centreY) = latLngToPoint center zoom
-    (halfWidth, halfHeight) = divideBy (width, height) 2
-    ne = (centreX - halfWidth, centreY - halfHeight)
-    sw = (centreX + halfWidth, centreY + halfHeight)
-    -- d1 = Debug.log "halfSize" (halfWidth, halfHeight)
-    -- d2 = Debug.log "pixelBounds" (ne, sw)
+    s = 1
+    pixelCentre = latLngToPoint center zoom
+    halfSize = divideBy size (s * 2)
+    ne = mapPoint (-) pixelCentre halfSize
+    sw = mapPoint (+) pixelCentre halfSize
   in
     (ne, sw)
 
@@ -35,112 +33,65 @@ pxBoundsToTileRange bounds =
 
 getTileSize = (256, 256)
 
--- mapXRange : Float -> String
--- mapXRange x = toString x
+mapXRange : Zoom -> List Float -> Float -> Coords
+mapXRange z xRange y =
+  List.map (\x -> (x, y, z)) xRange
 
-mapYRange : Int -> List Float -> Float -> List Coord
-mapYRange z xRange y = List.map (\x -> (x, y, z)) xRange
+getCoords : Bounds -> Zoom -> Coords
+getCoords ((tileRangeMinX, tileRangeMinY), (tileRangeMaxX, tileRangeMaxY)) zoom =
+  List.concatMap (mapXRange zoom [tileRangeMinX..tileRangeMaxX]) [tileRangeMinY..tileRangeMaxY]
 
-getOriginLevel : Int -> (Float, Float) -> (Float, Float)
-getOriginLevel zoom origin =
-  let
-    unprojected = pointToLatLng origin zoom
-    projected = latLngToPoint unprojected zoom
-  in
-    roundPoint projected
+createTile wrapX coord =
+  wrapCoords wrapX coord
 
+createTiles wrapX coords =
+  case wrapX of
+    Nothing ->
+      List.map (createTile (0,1)) coords
+    Just wrapLng ->
+      List.map (createTile (wrapLng)) coords
 
-getTilePos : (Float, Float) -> (Float, Float, Int) -> (Float, Float)
-getTilePos origin (x, y, zoom) =
-  let
-    scaled = scaleBy (x, y) getTileSize
-    subtracted = subtractPoint scaled (getOriginLevel zoom origin)
-  in
-    subtracted
-
-addTile : Point -> Coord -> Coord
-addTile origin (x, y, zoom) =
-  let
-    (k, l) = getTilePos origin (x, y, zoom)
-    -- key = tileCoordsToKey (x, y, zoom)
-  in
-    (k, l, zoom)
-
-tileCoordsToKey : (Float, Float, Int) -> String
-tileCoordsToKey (x, y, z) =
-  (toString x) ++ ":" ++ (toString y) ++ ":" ++ (toString z)
-
--- isValidTile : (Float, Float, Float) -> Bool
--- isValidTile (x, y, z) =
---   let
---     pixelWorldBounds = getProjectedBounds z
---     globalTileRange = pxBoundsToTileRange pixelWorldBounds
--- 		var crs = this._map.options.crs;
---
--- 		if (!crs.infinite) {
--- 			// don't load tile if it's out of bounds and not wrapped
--- 			var bounds = this._globalTileRange;
--- 			if ((!crs.wrapLng && (coords.x < bounds.min.x || coords.x > bounds.max.x)) ||
--- 			    (!crs.wrapLat && (coords.y < bounds.min.y || coords.y > bounds.max.y))) { return false; }
--- 		}
---
--- 		if (!this.options.bounds) { return true; }
---
--- 		// don't load tile if it doesn't intersect the bounds in options
--- 		var tileBounds = this._tileCoordsToBounds(coords);
--- 		return L.latLngBounds(this.options.bounds).overlaps(tileBounds);
--- 	},
-
-osm = "//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-subdomains = ["a", "b", "c"]
-
--- getSubdomain : Coord -> String
--- getSubdomain (x, y, z) =
---   let
---     index = (abs (x + y) % (List.length subdomains)
---   in
---     List.foldr (\s -> s) (List.head subdomains) subdomains
-  -- var index = Math.abs(tilePoint.x + tilePoint.y) % this.options.subdomains.length;
-  -- return this.options.subdomains[index];
-
-getTileUrl : Coord -> String
-getTileUrl (x, y, z) =
-  let
-    zxy = String.join "/" (List.map toString [z, round x, round y])
-    url = "//a.tile.openstreetmap.org/" ++ zxy ++ ".png"
-    d = Debug.log "url" url
-  in
-    url
-
-
--- createTile : Coord -> a
--- createTile (x, y, z) =
-
-
-update : LngLat -> Zoom -> Point -> Point -> Bounds
-update centre zoom (width, height) origin =
+update centre zoom (width, height) wrapX =
   let
     pixelBounds = getTiledPixelBounds centre zoom (width, height)
     tileRange = pxBoundsToTileRange pixelBounds
     tileCenter = getBoundsCentre tileRange False
-    ((rangeMinX, rangeMinY), (rangeMaxX, rangeMaxY)) = tileRange
-
-    tileCoords = List.concatMap (mapYRange zoom [rangeMinX..rangeMaxX]) [rangeMinY..rangeMaxY]
-    i = List.map (addTile origin) tileCoords
-    s = List.map getTileUrl tileCoords
-    -- d1 = Debug.log "tileRange X" [rangeMinX..rangeMaxX]
-    -- d2 = Debug.log "tileRange Y" [rangeMinY..rangeMaxY]
-    -- d3 = Debug.log "result" tileCenter
+    coords = getCoords tileRange zoom
+    tiles = createTiles wrapX coords
+    urls = List.map (\(x,y,z) -> "https://a.tile.openstreetmap.org/2/" ++ (toString x) ++ "/" ++ (toString y) ++ ".png") tiles
+    -- images = List.map (\u -> (img [src u])) urls
   in
-    (pixelBounds)
+    urls
+
+wrapCoords : (Float, Float) -> Coord -> Coord
+wrapCoords wrapX (x, y, z) =
+  (wrapNum x wrapX, y, z)
+
+getWrapX : Int -> Maybe (Float, Float)
+getWrapX zoom =
+  case EPSG3857.wrapLng of
+    Nothing ->
+      Nothing
+    Just (wrapLngX, wrapLngY) ->
+      let
+        (tileSizeX, tileSizeY) = getTileSize
+        (x1, y1) = latLngToPoint (wrapLngX, 0) zoom
+        (x2, y2) = latLngToPoint (wrapLngY, 0) zoom
+        floored = floor (x1 / tileSizeX)
+        ceiled = ceiling (x2 / tileSizeY)
+      in
+        Just (toFloat floored, toFloat ceiled)
+
 
 -- Exports
-view : Maybe String -> TileOptionSet -> { centre : (Float, Float), zoom : Int, size : (Float, Float), origin : (Float, Float) } -> Html a
+view : Maybe String -> TileOptionSet -> { centre : (Float, Float), zoom : Int, size : (Float, Float), origin: (Float, Float) } -> Html a
 view url options {centre, zoom, size, origin} =
   let
     tileOptions = getTileOptions url options
     (width, height) = size
-    s = update centre zoom size origin
+    wrapX = getWrapX zoom
+    s = update centre zoom size wrapX
+    children = List.map (\u -> (img [ src u ] [])) s
   in
     div [ class "raelm-layer"
         , style [ ("opacity", toString tileOptions.opacity)
@@ -151,10 +102,4 @@ view url options {centre, zoom, size, origin} =
                 , ("height", "100%")
                 ]
         ]
-      [ text ("My Tile Layer: " ++ (toString zoom))
-      , text (
-        case tileOptions.url of
-          Just x -> x
-          Nothing -> "No url provided"
-      )
-      ]
+        children

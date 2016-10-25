@@ -1,10 +1,13 @@
 module Raelm.Geo.CRS.Earth exposing (..)
 
-import Raelm.Geo.Types exposing (WrapLng, R)
+import Raelm.Geo.Types exposing (WrapLng, WrapLat, R)
 import Raelm.Types.Coordinates exposing (LngLat)
 
 wrapLng : WrapLng
 wrapLng = Just (-180, 180)
+
+wrapLat : WrapLat
+wrapLat = Nothing
 
 r : R
 r = 6371000
