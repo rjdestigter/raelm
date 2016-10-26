@@ -1,42 +1,48 @@
 module Raelm.Map.Update exposing (..)
 
 import Raelm.Map.Messages exposing (MapEvent(..), MapMessage(..))
-import Raelm.Map.Models exposing (MapPositionModel, MapEventsModel, DomModel)
+import Raelm.Map.Models exposing (MapModel, MapEventsModel, DomModel)
 import Raelm.Types.Coordinates exposing (X, Y, Z, XY)
 import Raelm.Utils.Coordinates exposing (..)
 import Raelm.Geo.CRS.EPSG3857 exposing (latLngToPoint, pointToLatLng)
 import DOM exposing (Rectangle)
 import Debug exposing (..)
+import Raelm.Map.Views exposing (getPixelOrigin)
 
-zoomTo : MapPositionModel -> Z -> MapPositionModel
+zoomTo : MapModel -> Z -> MapModel
 zoomTo model z = ({ model | zoom = z })
 
-centre : MapPositionModel -> XY -> MapPositionModel
+centre : MapModel -> XY -> MapModel
 centre model (x, y) = ({ model | centre = (x, y) })
 
 initialized : Maybe Rectangle -> DomModel
 initialized rect = DomModel True rect
 
-init : MapPositionModel -> Maybe Rectangle -> MapPositionModel
+init : MapModel -> Maybe Rectangle -> MapModel
 init model rect = ({ model | dom = (initialized rect) })
 
-click : MapPositionModel -> (Float, Float) -> MapPositionModel
+-- halfSize = divideBy (width, height) 2
+-- pixelCentre = latLngToPoint centre zoom
+-- pixelOrigin = getPixelOrigin halfSize (left, top) centre zoom
+-- projectedPoint = mapPoint (+) (mapPoint (-) events.move (left, top)) pixelOrigin
+-- lngLat = pointToLatLng projectedPoint zoom
+
+click : MapModel -> (Float, Float) -> MapModel
 click model (x, y) =
   let
    events = (moveEvent x y model.events)
-   centre = model.centre
-  --  centre =
-  --    case model.dom.rect of
-  --      Nothing -> model.centre
-  --      Just {top, left, width, height} ->
-  --        let
-  --          halfSize = divideBy (width, height) 2
-  --          pixelCentre = latLngToPoint model.centre model.zoom
-  --          pixelOrigin = addPoint (subtractPoint pixelCentre halfSize) (left, top)
-  --          projectedPoint = mapPoint (+) (mapPoint (-) events.move (left, top)) pixelOrigin
-  --          lngLat = pointToLatLng projectedPoint model.zoom
-  --        in
-  --          lngLat
+   centre =
+     case model.dom.rect of
+       Nothing -> model.centre
+       Just {top, left, width, height} ->
+         let
+           halfSize = divideBy (width, height) 2
+           pixelCentre = latLngToPoint model.centre model.zoom
+           pixelOrigin = getPixelOrigin halfSize (left, top) model.centre model.zoom
+           projectedPoint = mapPoint (+) (mapPoint (-) (x, y) (left, top)) pixelOrigin
+           lngLat = pointToLatLng projectedPoint model.zoom
+         in
+           lngLat
   in
     ({
       model
@@ -44,7 +50,7 @@ click model (x, y) =
         , events = (clickEvent x y model.events)
     })
 
-move : MapPositionModel -> (Float, Float) -> MapPositionModel
+move : MapModel -> (Float, Float) -> MapModel
 move model (x, y) =
   let
     dom = if model.events.down then updateRect x y model.events.downPosition model.dom else model.dom
@@ -76,10 +82,10 @@ updateRect x y downPosition {initialized, rect} =
         Nothing ->
           DomModel False Nothing
 
-down : MapPositionModel -> MapPositionModel
+down : MapModel -> MapModel
 down model = ({ model | events = (downEvent model.events) })
 
-up : MapPositionModel -> MapPositionModel
+up : MapModel -> MapModel
 up model = ({ model | events = (upEvent model.events) })
 
 clickEvent : Float -> Float -> MapEventsModel -> MapEventsModel
@@ -113,7 +119,7 @@ upEvent mapEvent = ({
   , downPosition = Nothing
   })
 
-update : MapMessage -> MapPositionModel -> ( MapPositionModel, Cmd MapMessage )
+update : MapMessage -> MapModel -> ( MapModel, Cmd MapMessage )
 update message model =
   let
     d = 4 -- Debug.log "event" (message, model)

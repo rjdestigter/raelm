@@ -56,7 +56,7 @@ zoom scale =
   (logBase e (scale / 256)) / ln2
 
 -- Returns the projection's bounds scaled and transformed for the provided `zoom`.
--- getProjectedBounds : Bounds -> (Point -> Float -> LngLat) -> Int -> Bounds
+getProjectedBounds : Bounds -> (Point -> Float -> LngLat) -> Int -> Bounds
 getProjectedBounds bounds transformFn zoom =
   getMinMaxBounds bounds
 

@@ -29,12 +29,12 @@ ceilPoint (x, y) =
   (toFloat (ceiling x), toFloat (ceiling y))
 
 subtractPoint : Point -> Point -> Point
-subtractPoint (x, y) (subtractX, subtractY) =
-  (x - subtractX, y - subtractY)
+subtractPoint point1 point2 =
+  mapPoint (-) point1 point2
 
 addPoint : Point -> Point -> Point
-addPoint (x, y) (addX, addY) =
-  (x - addX, y - addY)
+addPoint point1 point2 =
+  mapPoint (+) point1 point2
 
 mapPoint : (Float -> Float -> Float) -> Point -> Point -> Point
 mapPoint mapper (x, y) (k, l) =
@@ -47,6 +47,16 @@ divideBy (x, y) f =
 roundPoint : Point -> Point
 roundPoint (x, y) =
   (toFloat (round x), toFloat (round y))
+
+toFixed : Int -> Point -> Point
+toFixed precision point1 =
+  let
+    point1 = mapPoint (*) point1 (toFloat precision, toFloat precision)
+    point2 = roundPoint point1
+  in
+    mapPoint (/) point2 (toFloat precision, toFloat precision)
+
+
 
 getBoundsCentre ((x1, y1), (x2, y2)) roundIt =
   let

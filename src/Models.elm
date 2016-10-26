@@ -1,9 +1,9 @@
 module Models exposing (..)
 
-import Raelm.Map.Models exposing (MapPositionModel)
+import Raelm.Map.Models exposing (MapModel)
 
 type alias AppModel =
-  { mapModel : MapPositionModel
+  { mapModel : MapModel
   }
 
 initialModel : AppModel

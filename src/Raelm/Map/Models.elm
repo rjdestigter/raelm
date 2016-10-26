@@ -14,14 +14,14 @@ type alias DomModel =
   , rect: Maybe Rectangle
   }
 
-type alias MapPositionModel =
+type alias MapModel =
   { centre : (Float, Float)
   , zoom : Int
   , events: MapEventsModel
   , dom: DomModel
   }
 
-initialModel : MapPositionModel
+initialModel : MapModel
 initialModel =
   { centre = (0, 0)
   , zoom = 6

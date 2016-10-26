@@ -1,6 +1,6 @@
 module Raelm.Geo.Projection.SphericalMercator exposing (..)
-import Raelm.Types.Coordinates exposing (Point, LngLat, Bounds)
-import Raelm.Geo.Types exposing (R, MaxLatitude)
+import Raelm.Types.Coordinates exposing (..)
+import Raelm.Geo.Types exposing (..)
 
 r : R
 r = 6378137
@@ -8,7 +8,7 @@ r = 6378137
 maxLatitude : MaxLatitude
 maxLatitude = 85.0511287798
 
-project : LngLat -> Point
+project : Project
 project (x, y) =
   let
     d : Float
@@ -29,7 +29,7 @@ project (x, y) =
   in
     (px, py)
 
-unproject : Point -> LngLat
+unproject : Unproject
 unproject (x, y) =
   let
     d = 180 / pi
@@ -44,3 +44,5 @@ bounds =
     d = (toFloat r) * pi
   in
     ((-d, -d), (d, d))
+
+exports = Projection r project unproject bounds

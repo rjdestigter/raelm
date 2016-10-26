@@ -8,4 +8,5 @@ raelmContainer =
   , width (pc 100)
   , height (pc 100)
   , backgroundColor "Cyan"
+  , overflow "hidden"
   ]
