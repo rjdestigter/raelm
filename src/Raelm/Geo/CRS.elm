@@ -36,7 +36,7 @@ project : (LngLat -> Point) -> LngLat -> Point
 project projectFn latlng =
   projectFn latlng
 
--- Given a projected coordinate returns the corresponding LatLng.
+-- Given a projected coordinate returns the corresponding LngLat.
 -- The inverse of `project`.
 unproject : (Point -> LngLat) -> Point -> LngLat
 unproject unprojectFn point =

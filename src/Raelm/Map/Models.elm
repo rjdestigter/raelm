@@ -24,7 +24,7 @@ type alias MapModel =
 initialModel : MapModel
 initialModel =
   { centre = (0, 0)
-  , zoom = 6
+  , zoom = 4
   , events = MapEventsModel (0, 0) (0, 0) False Nothing
   , dom = DomModel False Nothing
   }

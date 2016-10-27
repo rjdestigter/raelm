@@ -10,7 +10,6 @@ type alias Lat = Float
 type alias Lng = Float
 type alias Point = (X, Y)
 type alias LngLat = (Lng, Lat)
-type alias LatLng = (Lat, Lng)
 type alias Bounds = (Point, Point)
 type alias LngLatBounds = (LngLat, LngLat)
 type alias Coord = (X, Y, Z)

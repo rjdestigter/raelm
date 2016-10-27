@@ -10,6 +10,7 @@ import Raelm.Geo.CRS exposing (scale)
 import Raelm.Geo.CRS.EPSG3857 as EPSG3857 exposing (latLngToPoint, pointToLatLng)
 import Raelm.Types.Coordinates exposing (Point, LngLat, Bounds, Zoom, Coord, Coords)
 import Raelm.Utils.Coordinates exposing (..)
+import Raelm.Types.Map exposing (..)
 
 getTiledPixelBounds : LngLat -> Int -> (Float, Float) -> Bounds
 getTiledPixelBounds center zoom size =
@@ -91,13 +92,13 @@ getWrapX zoom =
 
 
 -- Exports
-view : Maybe String -> TileOptionSet -> { centre : (Float, Float), zoom : Int, size : (Float, Float), origin: (Float, Float) } -> Html a
-view url options {centre, zoom, size, origin} =
+view : Maybe String -> TileOptionSet -> Raelm -> Html a
+view url options map =
   let
     tileOptions = getTileOptions url options
-    (width, height) = size
-    wrapX = getWrapX zoom
-    s = update centre zoom size wrapX origin
+    (width, height) = map.getSize
+    wrapX = getWrapX map.getZoom
+    s = update map.getCentre map.getZoom map.getSize wrapX map.getPixelOrigin
     children = List.map (\(u, (x, y)) -> (img [ src u, style [ ("position", "absolute"), ("transform", "translate3d(" ++ (toString x) ++ "px," ++ (toString y) ++ "px,0)") ] ] [])) s
   in
     div [ class "raelm-layer"

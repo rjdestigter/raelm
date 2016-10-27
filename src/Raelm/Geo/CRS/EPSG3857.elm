@@ -47,4 +47,5 @@ pointToLatLng = CRS.pointToLatLng untransform unproject
 getProjectedBounds = CRS.getProjectedBounds bounds transform
 
 projection = SphericalMercator.exports
+
 crs = CRS r wrapLng Nothing projection distance transform untransform scale zoom latLngToPoint pointToLatLng getProjectedBounds

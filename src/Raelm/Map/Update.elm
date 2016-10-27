@@ -7,7 +7,7 @@ import Raelm.Utils.Coordinates exposing (..)
 import Raelm.Geo.CRS.EPSG3857 exposing (latLngToPoint, pointToLatLng)
 import DOM exposing (Rectangle)
 import Debug exposing (..)
-import Raelm.Map.Views exposing (getPixelOrigin)
+import Raelm.Map exposing (defaultMapType)
 
 zoomTo : MapModel -> Z -> MapModel
 zoomTo model z = ({ model | zoom = z })
@@ -37,10 +37,10 @@ click model (x, y) =
        Just {top, left, width, height} ->
          let
            halfSize = divideBy (width, height) 2
-           pixelCentre = latLngToPoint model.centre model.zoom
-           pixelOrigin = getPixelOrigin halfSize (left, top) model.centre model.zoom
+           pixelCentre = defaultMapType.crs.latLngToPoint model.centre model.zoom
+           pixelOrigin = defaultMapType.getPixelOrigin (left, top) halfSize model.centre model.zoom
            projectedPoint = mapPoint (+) (mapPoint (-) (x, y) (left, top)) pixelOrigin
-           lngLat = pointToLatLng projectedPoint model.zoom
+           lngLat = defaultMapType.crs.pointToLatLng projectedPoint model.zoom
          in
            lngLat
   in
