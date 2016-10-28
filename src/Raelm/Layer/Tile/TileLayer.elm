@@ -4,22 +4,22 @@ import Debug exposing (..)
 -- Html imports
 import Html exposing (Html, div, text, img)
 import Html.Attributes exposing (class, style, src)
-
+import Html.Keyed exposing (node)
 import Raelm.Layer.Tile.Types exposing (..)
 import Raelm.Geo.CRS exposing (scale)
 import Raelm.Geo.CRS.EPSG3857 as EPSG3857 exposing (latLngToPoint, pointToLatLng)
 import Raelm.Types.Coordinates exposing (Point, LngLat, Bounds, Zoom, Coord, Coords)
 import Raelm.Utils.Coordinates exposing (..)
 import Raelm.Types.Map exposing (..)
+import Debug exposing (log)
 
-getTiledPixelBounds : LngLat -> Int -> (Float, Float) -> Bounds
-getTiledPixelBounds center zoom size =
+getTiledPixelBounds : Raelm -> Bounds
+getTiledPixelBounds map =
   let
     s = 1
-    pixelCentre = latLngToPoint center zoom
-    halfSize = divideBy size (s * 2)
-    ne = mapPoint (-) pixelCentre halfSize
-    sw = mapPoint (+) pixelCentre halfSize
+    pixelCentre = latLngToPoint map.getCentre map.getZoom
+    ne = mapPoint (-) pixelCentre map.getHalfSize
+    sw = mapPoint (+) pixelCentre map.getHalfSize
   in
     (ne, sw)
 
@@ -59,14 +59,15 @@ createTiles wrapX coords =
 getTileUrl (x, y, zoom) =
   "https://a.tile.openstreetmap.org/" ++ (toString zoom) ++ "/" ++ (toString x) ++ "/" ++ (toString y) ++ ".png"
 
-update centre zoom (width, height) wrapX origin =
+update map wrapX =
   let
-    pixelBounds = getTiledPixelBounds centre zoom (width, height)
+    pixelBounds = getTiledPixelBounds map
     tileRange = pxBoundsToTileRange pixelBounds
     tileCenter = getBoundsCentre tileRange False
-    coords = getCoords tileRange zoom
+    coords = getCoords tileRange map.getZoom
+    r = Debug.log "coords" coords
     tiles = createTiles wrapX coords
-    urls = List.map (\c -> (getTileUrl c, getTilePos c origin)) tiles
+    urls = List.map (\c -> (getTileUrl c, getTilePos c map.getPixelOrigin)) tiles
     -- images = List.map (\u -> (img [src u])) urls
   in
     urls
@@ -98,10 +99,12 @@ view url options map =
     tileOptions = getTileOptions url options
     (width, height) = map.getSize
     wrapX = getWrapX map.getZoom
-    s = update map.getCentre map.getZoom map.getSize wrapX map.getPixelOrigin
-    children = List.map (\(u, (x, y)) -> (img [ src u, style [ ("position", "absolute"), ("transform", "translate3d(" ++ (toString x) ++ "px," ++ (toString y) ++ "px,0)") ] ] [])) s
+    s = update map wrapX -- map.getCentre map.getZoom map.getSize wrapX map.getPixelOrigin
+    children = List.map (\(u,
+      (x, y)) ->
+        ((toString x) ++ (toString y), (img [ src u, style [ ("position", "absolute"), ("transform", "translate3d(" ++ (toString x) ++ "px," ++ (toString y) ++ "px,0)") ] ] []))) s
   in
-    div [ class "raelm-layer"
+    Html.Keyed.node "div" [ class "raelm-layer"
         , style [ ("opacity", toString tileOptions.opacity)
                 , ("position", "absolute")
                 , ("top", "0px")

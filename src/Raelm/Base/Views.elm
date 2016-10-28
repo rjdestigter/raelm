@@ -30,7 +30,7 @@ onInitialize = Raelm.Base.MouseEvents.onInitialize
 view mapId eventMode initialized children =
   div [ style raelmContainer
       , id mapId
-      , onClick eventMode
+      -- , onClick eventMode
       , onMouseDown
       , onMouseUp
       , if initialized then onMove else onInitialize mapId

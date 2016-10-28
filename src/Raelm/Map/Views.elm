@@ -67,6 +67,7 @@ children raelmModel =
               [ coords "Centre (lng,lat)" (toFixed 2 map.getCentre)
               , coords "Mouse (lng, lat)" (toFixed 2 map.mouseLngLat)
               , coords "Mouse (x, y)" (toFixed 2 map.mousePoint)
+              , coords "Pane (x, y)" (toFixed 2 map.getMapPanePos)
               ]
           , openStreetMap map
         ]

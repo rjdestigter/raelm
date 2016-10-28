@@ -15,6 +15,8 @@ type alias LngLatBounds = (LngLat, LngLat)
 type alias Coord = (X, Y, Z)
 type alias Coords = List Coord
 
+type PanePos = PanePos Point
+
 type alias BoundsMinMax = {
   minX : Point,
   minY : Point,

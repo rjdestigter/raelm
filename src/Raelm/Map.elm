@@ -6,20 +6,26 @@ import Raelm.Types.Map exposing (..)
 import Raelm.Utils.Coordinates exposing (..)
 import Raelm.Map.Models exposing (MapModel)
 import Raelm.Geo.CRS.EPSG3857 as EPSG3857 exposing (..)
+import Debug
 
-getCentre : CRS -> Point -> Point -> Point -> Zoom -> LngLat
+getCentre : CRS -> Point -> PanePos -> Point -> Zoom -> LngLat
 getCentre crs pixelOrigin panePos halfSize zoom =
   let
-    layerPoint : Point
-    layerPoint = subtractPoint halfSize panePos
-
-    projectedPoint : Point
-    projectedPoint = addPoint halfSize pixelOrigin
-
-    pointToLatLng : Point -> Zoom -> LngLat
-    pointToLatLng = crs.pointToLatLng
+    pos =
+      case panePos of
+        PanePos point -> point
   in
-    pointToLatLng projectedPoint zoom
+    let
+      layerPoint : Point
+      layerPoint = subtractPoint halfSize pos
+
+      projectedPoint : Point
+      projectedPoint = addPoint layerPoint pixelOrigin
+      r= Debug.log "projectedPoint" projectedPoint
+      pointToLatLng : Point -> Zoom -> LngLat
+      pointToLatLng = crs.pointToLatLng
+    in
+      pointToLatLng projectedPoint zoom
 
 getPixelOrigin : CRS -> Point -> Point -> LngLat -> Zoom -> Point
 getPixelOrigin crs panePos halfSize centre zoom =
@@ -62,9 +68,9 @@ raelm maybeMapType =
               (top, left, width, height)
         halfSize = divideBy (width, height) 2
         pixelCentre = mapType.crs.latLngToPoint centre zoom
-        pixelOrigin = mapType.getPixelOrigin (left, top) halfSize centre zoom
+        pixelOrigin = mapType.getPixelOrigin (0,0) halfSize centre zoom
         projectedPoint = mapPoint (+) (mapPoint (-) events.move (left, top)) pixelOrigin
         lngLat = mapType.crs.pointToLatLng projectedPoint zoom
-        mapCentre = mapType.getCentre pixelOrigin (left, top) halfSize zoom
+        mapCentre = mapType.getCentre pixelOrigin (PanePos (left, top)) halfSize zoom
       in
-        Raelm mapType.crs mapCentre zoom (width, height) halfSize pixelOrigin (left, top) lngLat events.move
+        Raelm mapType.crs centre mapCentre zoom (width, height) halfSize pixelCentre pixelOrigin (left, top) lngLat events.move
