@@ -8,3 +8,6 @@ Leaflet is a javascript library helping you create maps and showing geospatial d
 - npm install
 - elm-package install
 - npm run dev
+
+# Zoom, Centre
+Inital map model data like centre and zoom are set in src/Raelm/Map/Models.elm
