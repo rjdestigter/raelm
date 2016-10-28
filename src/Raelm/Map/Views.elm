@@ -21,6 +21,9 @@ import Raelm.Utils.Style exposing (toPixel)
 
 import Raelm.Map exposing (defaultRaelm)
 
+import Raelm.Controls.ZoomControl as ZoomControl exposing (..)
+import Raelm.Base.Messages exposing (EventMsg(..))
+
 layerOptions = LayerOptions Nothing Nothing Nothing Nothing
 
 -- Exports
@@ -34,20 +37,21 @@ coords label (x, y) =
     , text ")"
     ]
 
-t : List (String, String) -> Point -> List (String, String)
-t s (x, y) =
+t : Point -> List (String, String) -> List (String, String)
+t (x, y) s =
   List.concat [s, [ ("position", "absolute")
   , ("transform", "translateX(" ++ (toPixel x) ++ ") translateY(" ++ (toPixel y) ++ ")")
-  , ("top", "0px")
-  , ("left", "0px")
+  -- , ("top", "0px")
+  -- , ("left", "0px")
   ]]
 
 openStreetMap = tileLayer (Just "http") (LayerOption layerOptions)
 
-children : MapModel -> Html a
+children : MapModel -> Html EventMsg
 children raelmModel =
   let
     map = defaultRaelm raelmModel
+    post = t (subtractPoint (0, 0) map.getMapPanePos)
   in
     div [ style [ ("position", "absolute")
                 , ("top", "0px")
@@ -55,21 +59,22 @@ children raelmModel =
                 ]
         ]
         [
-          div [ style (t [ ("backgroundColor", "Yellow")
+          div [ style (post [ ("backgroundColor", "Yellow")
                       , ("position", "absolute")
                       , ("width", "100vw")
                       , ("height", "50px")
                       , ("zIndex", "10")
                       , ("display", "flex")
                       , ("justify-content", "space-around")
-                      ] (subtractPoint (0, 0) map.getMapPanePos))
+                      ])
               ]
-              [ coords "Centre (lng,lat)" (toFixed 2 map.getCentre)
-              , coords "Mouse (lng, lat)" (toFixed 2 map.mouseLngLat)
+              [ coords "Centre (lng,lat)" (toFixed 5 map.getCentre)
+              , coords "Mouse (lng, lat)" (map.mouseLngLat)
               , coords "Mouse (x, y)" (toFixed 2 map.mousePoint)
               , coords "Pane (x, y)" (toFixed 2 map.getMapPanePos)
               ]
           , openStreetMap map
+          , ZoomControl.view post map.getZoom
         ]
 
 -- view : (a -> b) -> c -> MapModel -> Html MapMessage

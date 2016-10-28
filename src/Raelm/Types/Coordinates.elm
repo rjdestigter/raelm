@@ -17,6 +17,8 @@ type alias Coords = List Coord
 
 type PanePos = PanePos Point
 
+type PointTuple a b = PointTuple a | LngLatTuple b
+
 type alias BoundsMinMax = {
   minX : Point,
   minY : Point,

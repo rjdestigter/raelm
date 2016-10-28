@@ -23,8 +23,8 @@ type alias MapModel =
 
 initialModel : MapModel
 initialModel =
-  { centre = (0, 0)
-  , zoom = 6
+  { centre = (5.052680969238282, 51.93135336754814)
+  , zoom = 18
   , events = MapEventsModel (0, 0) (0, 0) False Nothing
   , dom = DomModel False Nothing
   }
