@@ -49,8 +49,14 @@ pointToLngLat unproject scale untransform point zoom =
         zoomScale =
             scale zoom
 
+        void =
+            Debug.log "zoomScale" zoomScale
+
         untransformedPoint =
             untransform point zoomScale
+
+        void1 =
+            Debug.log "untransformedPoint" untransformedPoint
     in
         unproject untransformedPoint
 

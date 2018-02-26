@@ -45,12 +45,12 @@ transform1 =
 
 untransform : Point -> Float -> Point
 untransform =
-    Transformation.transform transformation
+    Transformation.untransform transformation
 
 
 untransform1 : Point -> Point
 untransform1 =
-    Transformation.transform1 transformation
+    Transformation.untransform1 transformation
 
 
 distance : LngLat -> LngLat -> Float
