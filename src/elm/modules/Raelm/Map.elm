@@ -96,11 +96,34 @@ styles x y =
         ]
 
 
-render : Html Action
-render =
+render : Model -> Html Action
+render model =
     H.div [ styles 0 0, E.on "click" (foo) ] []
 
 
-main : Html Action
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Action
+subscriptions model =
+    Sub.none
+
+
+update : Action -> Model -> ( Model, Cmd Action )
+update msg model =
+    ( model, Cmd.none )
+
+
+
+-- MAIN
+
+
+main : Program Never Model Action
 main =
-    render
+    H.program
+        { init = ( initialModel, Cmd.none )
+        , view = render
+        , update = update
+        , subscriptions = subscriptions
+        }
