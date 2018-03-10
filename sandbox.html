@@ -1,0 +1,69 @@
+<html>
+
+<head>
+    <script src="./mercator.js"></script>
+    <style>
+        .map {
+            position: relative;
+            margin: 100px;
+            background-color: coral;
+            width: 512px;
+            height: 512px;
+            box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.2), 2px 0 2px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.2), -2px 0 2px rgba(0, 0, 0, 0.2)
+        }
+
+        .tile {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: hotpink;
+            width: 256px;
+            height: 256px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="map"></div>
+    <script>
+        function createTile(x, y) {
+            const textNode = document.createElement('div')
+            textNode.innerText = `${x}, ${y}`
+
+            const tileNode = document.createElement('div')
+            tileNode.classList.add('tile')
+            tileNode.appendChild(textNode)
+
+            const [tx, ty] = [x, y].map((n, i) => n * tileSize - center[i])
+            tileNode.style.transform = `translate(${tx}px, ${ty}px)`
+
+            tileNode.style.background = `url(https://a.tile.openstreetmap.org/${zoom}/${x}/${y}.png)`
+
+            return tileNode
+        }
+
+        let center = [0, 0]
+        let zoom = 2
+        const size = [512, 512]
+        const tileSize = 256
+        const map = document.querySelector(".map")
+
+        for (let i = 0; i < size[0] / tileSize; i++) {
+            for (let j = 0; j < size[1] / tileSize; j++) {
+                console.group(i, j)
+                console.log([i * (tileSize + 1), j * (tileSize + 1), zoom])
+                const [x, y] = pixelsToTile([i * (tileSize + 1), j * (tileSize + 1), zoom])
+                console.log(x, y)
+                const tile = createTile(x, y)
+                map.appendChild(tile)
+                console.groupEnd()
+            }
+        }
+    </script>
+</body>
+
+</html>

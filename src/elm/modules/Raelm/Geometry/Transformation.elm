@@ -1,7 +1,6 @@
 module Raelm.Geometry.Transformation exposing (..)
 
 import Raelm.Geometry.Point as Point exposing (Point)
-import Debug
 
 
 type alias Transformation =
@@ -33,9 +32,6 @@ untransform ( a, b, c, d ) ( x, y ) scale =
 
         nextY =
             (y / scale - d) / c
-
-        void =
-            Debug.log "(a, b, c, d, x, y, 1, 2)" ( a, b, c, d, x, y, nextX, nextY )
     in
         ( nextX, nextY )
 
